@@ -1,7 +1,8 @@
+int builtInLedPin = 2;
 int transmitPin = 12;  // Transmitter pin
 int receivePin = 13;   // Receiver pin
 
-int dataToSend = 10;   // The number we want to send
+int dataToSend = 5;   // The number we want to send
 int receivedData = 0;  // Variable for received data
 
 void setup() {
@@ -10,14 +11,25 @@ void setup() {
   // Set up pins
   pinMode(transmitPin, OUTPUT);
   pinMode(receivePin, INPUT);
+
+  pinMode(builtInLedPin, OUTPUT);
+
+  Serial.print("Transmit Pin :");
+  Serial.println(transmitPin);
+  Serial.print("Receive Pin :");
+  Serial.println(receivePin);
   
   // Create two tasks
   xTaskCreate(transmitTask, "Transmit Task", 1000, NULL, 1, NULL);
-  xTaskCreate(receiveTask, "Receive Task", 1000, NULL, 1, NULL);
+  xTaskCreate(receiveTask, "Receive Task", 3000, NULL, 1, NULL);
 }
 
 void loop() {
-  // The loop can be empty, as the tasks are handled by FreeRTOS
+  // put your main code here, to run repeatedly:
+  digitalWrite(builtInLedPin, HIGH);
+  delay(1500);
+  digitalWrite(builtInLedPin, LOW);
+  delay(1000);
 }
 
 // Transmitter task
@@ -32,8 +44,7 @@ void transmitTask(void *pvParameters) {
 void receiveTask(void *pvParameters) {
   while (true) {
     receivedData = receiveData();
-    Serial.print("Received Data: ");
-    Serial.println(receivedData);
+    Serial.print(receivedData);
     vTaskDelay(1000 / portTICK_PERIOD_MS);  // 1 second delay between checks
   }
 }
@@ -59,3 +70,5 @@ int receiveData() {
 
   return data;
 }
+
+
